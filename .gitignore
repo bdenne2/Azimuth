@@ -1,0 +1,7 @@
+.classpath
+.project
+.settings/
+src/main/java/rockbeatspaper/Compass/CompassBlockListener.java
+src/test/
+target/
+
