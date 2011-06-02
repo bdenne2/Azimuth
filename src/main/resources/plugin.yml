@@ -1,4 +1,4 @@
-name: Compass
-main: rockbeatspaper.Compass.Compass
+name: Azimuth
+main: rockbeatspaper.Azimuth.Azimuth
 version: 0.1-SNAPSHOT
 author: Bryanna Denney

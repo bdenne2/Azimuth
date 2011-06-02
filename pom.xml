@@ -2,13 +2,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>rockbeatspaper.Compass</groupId>
-  <artifactId>Compass</artifactId>
+  <groupId>rockbeatspaper.Azimuth</groupId>
+  <artifactId>Azimuth</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Compass</name>
-  <url>http://maven.apache.org</url>
+  <name>Azimuth</name>
+  <url>https://github.com/bdenne2/Azimuth</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
