@@ -1,5 +1,7 @@
 package rockbeatspaper.Compass;
 
+import java.util.HashMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -8,119 +10,160 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-public class CompassPlayerListener extends PlayerListener{
-	
-	public static Compass plugin; 
-	public enum CompassModes { LAST_DEATH, PERSONAL_SPAWN, WORLD_SPAWN_POINT}
-	private CompassModes mode;
-	private Location personalSpawn;
-	private Location deathLocation;
-	private boolean setPersonalSpawn;
-	
-	public CompassPlayerListener(Compass instance) 
-	{ 	 
-        plugin = instance;
-        mode = CompassModes.PERSONAL_SPAWN;
-        setPersonalSpawn = true;
-        deathLocation = null;
+import rockbeatspaper.Compass.CompassContainer.CompassModes;
+
+public class CompassPlayerListener extends PlayerListener 
+{
+
+	public static Compass plugin;
+	private HashMap<Player, CompassContainer> players;
+
+	public CompassPlayerListener( Compass instance ) 
+	{
+		plugin = instance;
+		players = new HashMap<Player, CompassContainer>();
 	}
 
-//	public void onPlayerChat(PlayerChatEvent thisEvent )
-//	{
-//		thisEvent.getPlayer().sendMessage("No");
-//	}
-	
-	public void onPlayerInteract(PlayerInteractEvent event)
+	public void onPlayerInteract( PlayerInteractEvent event ) 
 	{
-		//declare and initialize player object
+		// declare and initialize player object
 		Player player = null;
 		player = event.getPlayer();
-		
-		//player.getRespawnLocation();
-		
-		//checks if the event is a right click event, on air or block
-		//if not, returns
-		if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK)
-		{
-			return; 
-		}
-		
-		//they are right clicking holding nothing, ergo exit
-		if(event.getItem() == null)
+
+		// checks if the event is a right click event, on air or block
+		// if not, returns
+		if ( event.getAction() != Action.RIGHT_CLICK_AIR &&
+		     event.getAction() != Action.RIGHT_CLICK_BLOCK ) 
 		{
 			return;
 		}
-		
-		//if the item used is compass(entity id 345)
-		if( event.getItem().getTypeId() == 345 ) 
+
+		// they are right clicking holding nothing, ergo exit
+		if ( event.getItem() == null ) 
 		{
-			
-			if( setPersonalSpawn)
+			return;
+		}
+
+		// if the item used is compass(entity id 345)
+		if ( event.getItem().getTypeId() == 345 ) 
+		{
+			CompassContainer container = players.get( player );
+			if ( container == null ) 
 			{
-				personalSpawn = player.getCompassTarget();
+				// create new container with values, insert into dictionary
+				container = new CompassContainer( player.getWorld().getSpawnLocation() );
+				container.setSpawnLocation( player.getCompassTarget() );
+				container.setMode( CompassModes.LAST_DEATH );
+				container.setSetPersonalSpawn( true );
+				players.put( player, container );
 			}
-			 
-			switch( mode)
+			
+			//logic for circling what compass is pointing to
+			CompassModes mode = container.getMode();
+			switch ( mode ) 
 			{
 			case PERSONAL_SPAWN:
-				this.setLastDeathMode(player);
+				this.setLastDeathMode( player );
 				break;
 			case LAST_DEATH:
-				this.setWorldSpawnPointMode(player, event);
+				this.setWorldSpawnPointMode( player );
 				break;
 			case WORLD_SPAWN_POINT:
-				this.setPersonalSpawnMode(player);
+				this.setPersonalSpawnMode( player );
 				break;
 			}
 		}
-		
-	}
-	
-	public void setDeathLocation(Location death)
-	{
-		deathLocation = death;
-	}
-	
-	@Override
-	public void onPlayerRespawn(PlayerRespawnEvent event)
-	{
-		personalSpawn = event.getRespawnLocation();
-		setPersonalSpawn = false;
-		//deathLocation = event.getPlayer().getLocation();
-		event.getPlayer().sendMessage("You respawned");	
+
 	}
 
-	private void setLastDeathMode(Player player) 
+	public void setDeathLocation( Location death, Player newPlayer ) 
 	{
-		mode = CompassModes.LAST_DEATH;
-		player.sendMessage("Compass set to: last death.");
-		//deathLocation = new Location( player.getWorld() , -9, 74, 48);
-		//player.setCompassTarget(deathLocation);
-		if( deathLocation != null)
+		//try to get value to player key in hashmap
+		CompassContainer container = players.get( newPlayer );
+		if (container == null) // I haven't seen them yet
 		{
-			player.setCompassTarget(deathLocation);
+			//create new container instance, populate with known values, insert into dictionary
+			container = new CompassContainer( newPlayer.getWorld().getSpawnLocation() );
+			container.setDeathLocation( death );
+			container.setSpawnLocation( newPlayer.getCompassTarget() );
+			container.setMode( CompassModes.LAST_DEATH );
+			
+			players.put( newPlayer, container );
+			setWorldSpawnPointMode(newPlayer);
+		} 
+		else // I have seen them, just set the location
+		{
+			container.setDeathLocation( death );
 		}
+	}
+
+	public void onPlayerRespawn( PlayerRespawnEvent event ) 
+	{
+		// declare and initialize player object
+		Player newPlayer = event.getPlayer();
+		//try to get value to player key in hashmap
+		CompassContainer container = players.get( newPlayer );
+		if ( container == null ) // I haven't seen them yet
+		{
+			//create new container instance, populate with known values, insert into dictionary
+			container = new CompassContainer( newPlayer.getWorld().getSpawnLocation() );
+			container.setSpawnLocation( event.getRespawnLocation() );
+			container.setMode( CompassModes.LAST_DEATH );
+			container.setSetPersonalSpawn( false );
+			
+			players.put( newPlayer, container );
+			setWorldSpawnPointMode( newPlayer );
+		}
+		else //I have seen them, just set the new location
+		{
+			container.setSpawnLocation( event.getRespawnLocation() );
+		}
+	}
+
+	private void setLastDeathMode( Player player ) 
+	{
+		//try to get value to player key in hashmap
+		CompassContainer container = players.get( player );
+		
+		//record moving to a new mode, then notify player
+		container.setMode( CompassContainer.CompassModes.LAST_DEATH );
+		player.sendMessage( "Compass set to: last death." );
+		
+		//don't know death location, player needs to die first
+		if ( container.getDeathLocation() == null )  
+		{
+			player.sendMessage( ChatColor.RED + "You haven't died yet. Pointing to personal spawn." );
+			player.setCompassTarget( container.getSpawnLocation() );	
+		} 
 		else
 		{
-			player.sendMessage(ChatColor.RED + "You haven't died yet. Pointing to personal spawn.");
-			player.setCompassTarget(personalSpawn);
+			player.setCompassTarget( container.getDeathLocation() );
 		}
+
+	}
+
+	private void setWorldSpawnPointMode( Player player ) 
+	{
+		//try to get value to player key in hashmap
+		CompassContainer container = players.get( player );
 		
+		//record moving to a new mode, then notify player
+		container.setMode( CompassContainer.CompassModes.WORLD_SPAWN_POINT );
+		player.sendMessage( "Compass set to: world spawn." );
+		
+		player.setCompassTarget( container.getWorldSpawnLocation() );
 	}
 
-	private void setWorldSpawnPointMode(Player player, PlayerInteractEvent event) 
+	private void setPersonalSpawnMode( Player player ) 
 	{
-		mode = CompassModes.WORLD_SPAWN_POINT;
-		player.sendMessage("Compass set to: world spawn.");
-		Location spawn_location = player.getWorld().getSpawnLocation();
-		player.setCompassTarget(spawn_location);
+		//try to get value to player key in hashmap
+		CompassContainer container = players.get( player );
+		
+		//record moving to a new mode, then notify player
+		container.setMode( CompassContainer.CompassModes.PERSONAL_SPAWN );
+		player.sendMessage( "Compass set to: personal spawn." );
+		
+		player.setCompassTarget( container.getSpawnLocation() );
 	}
 
-	private void setPersonalSpawnMode(Player player)
-	{
-		mode = CompassModes.PERSONAL_SPAWN;
-		player.sendMessage("Compass set to: personal spawn.");
-		player.setCompassTarget(personalSpawn);
-	}
-	
 }
