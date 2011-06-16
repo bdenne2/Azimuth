@@ -30,6 +30,15 @@ public class CompassContainer
 		playerModes.add(CompassModes.LAST_DEATH);
 	}
 	
+	public boolean removeMode(CompassModes mode)
+	{
+		if( playerModes.contains(mode) )
+		{
+			return playerModes.remove(mode);
+		}
+		return false;
+	}
+	
 	public CompassModes nextMode()
 	{
 		if( (mode+1) == playerModes.size() )

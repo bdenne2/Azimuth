@@ -26,11 +26,23 @@ public class CompassPlayerListener extends PlayerListener
 	
 	public boolean removeModeFromPlayer(Player player, String mode)
 	{
-		
-		
-		
-		
-		return false;
+		CompassContainer container = playersAndPrefs.get( player );
+		if( mode.equals("worldspawn") )
+		{
+			return container.removeMode( CompassModes.WORLD_SPAWN_POINT );
+		}
+		else if( mode.equals("personalSpawn") )
+		{
+			return container.removeMode( CompassModes.PERSONAL_SPAWN );
+		}
+		else if( mode.equals("lastdeath") )
+		{
+			return container.removeMode( CompassModes.LAST_DEATH );
+		}
+		else //this mode does not exist 
+		{
+			return false;
+		}
 	}
 	
 	public boolean addModeToPlayer(Player player, String mode)
@@ -77,11 +89,10 @@ public class CompassPlayerListener extends PlayerListener
 		{
 			return;
 		}
-
+		
 		// if the item used is compass(entity id 345)
 		if ( event.getItem().getTypeId() == 345 ) 
 		{
-			
 			createPlayer(player);
 			CompassContainer container = playersAndPrefs.get( player );
 			
@@ -89,15 +100,15 @@ public class CompassPlayerListener extends PlayerListener
 			CompassModes mode = container.nextMode();
 			switch ( mode ) 
 			{
-			case PERSONAL_SPAWN:
-				this.setPersonalSpawnMode( player );
-				break;
-			case LAST_DEATH:
-				this.setLastDeathMode( player );
-				break;
-			case WORLD_SPAWN_POINT:
-				this.setWorldSpawnPointMode( player );
-				break;
+				case PERSONAL_SPAWN:
+					this.setPersonalSpawnMode( player );
+					break;
+				case LAST_DEATH:
+					this.setLastDeathMode( player );
+					break;
+				case WORLD_SPAWN_POINT:
+					this.setWorldSpawnPointMode( player );
+					break;
 			}
 		}
 

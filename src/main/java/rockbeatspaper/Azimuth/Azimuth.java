@@ -48,14 +48,14 @@ public class Azimuth extends JavaPlugin
 			{
 				newArgs += args[i];
 			}
-			//newArgs.replace(' ', '');
+			
 			newArgs = newArgs.toLowerCase();
 			//TODO make argument checking smarter
 			newArgs = newArgs.replaceAll("[\\s\\W]", ""); //replace all whitespace or non-alphanumeric chars with empty
 			
 			if( !playerListener.addModeToPlayer( (Player) sender, newArgs) )
 			{
-				
+				sender.sendMessage("Did not go through. Something messed up.");
 			}
 			
 			return true; //finished command code
