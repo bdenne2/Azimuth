@@ -1,5 +1,6 @@
 package rockbeatspaper.Azimuth;
 
+import java.util.ArrayList;
 import org.bukkit.Location;
 
 public class CompassContainer 
@@ -7,19 +8,10 @@ public class CompassContainer
 	private Location deathLocation;
 	private Location spawnLocation;
 	public enum CompassModes { LAST_DEATH, PERSONAL_SPAWN, WORLD_SPAWN_POINT}
-	private CompassModes mode;
+	private int mode;
+	private ArrayList<CompassModes> playerModes;
 	private boolean setPersonalSpawn;
 	private Location worldSpawnLocation;
-	
-	/*CompassContainer(Location newDeathLocation, Location newSpawnLocation, Location newWorldSpawnLocation, CompassModes newMode, boolean newSetPersonalSpawn)
-	{
-		deathLocation = newDeathLocation;
-		spawnLocation = newSpawnLocation;
-		worldSpawnLocation = newWorldSpawnLocation;
-		mode = newMode;
-		setPersonalSpawn = newSetPersonalSpawn;
-	}
-	*/
 	
 	public CompassContainer(Location newWorldSpawnLocation)
 	{
@@ -28,9 +20,24 @@ public class CompassContainer
 		//default values for the rest
 		deathLocation = null;
 		spawnLocation = null;
-		mode = CompassModes.WORLD_SPAWN_POINT;
+		mode = 0;
 		setPersonalSpawn = true;
 		
+		//create linked list with three default values
+		playerModes = new ArrayList<CompassModes>();
+		playerModes.add(CompassModes.WORLD_SPAWN_POINT);
+		playerModes.add(CompassModes.PERSONAL_SPAWN);
+		playerModes.add(CompassModes.LAST_DEATH);
+	}
+	
+	public CompassModes nextMode()
+	{
+		if( (mode+1) == playerModes.size() )
+		{
+			return playerModes.get(0);
+		}
+		
+		return playerModes.get(mode+1);
 	}
 	
 	public Location getWorldSpawnLocation()
@@ -50,7 +57,7 @@ public class CompassContainer
 	
 	public CompassModes getMode()
 	{
-		return mode;
+		return playerModes.get(mode);
 	}
 	
 	public boolean getSetPersonalSpawn()
@@ -73,9 +80,17 @@ public class CompassContainer
 		spawnLocation = newSpawnLocation;
 	}
 	
-	public void setMode(CompassModes newMode)
+	public boolean setMode(CompassModes newMode)
 	{
-		mode = newMode;
+		if( playerModes.contains(newMode) )
+		{
+			mode = playerModes.indexOf(newMode);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	public void setSetPersonalSpawn(boolean newValue)

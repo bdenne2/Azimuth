@@ -16,14 +16,48 @@ public class CompassPlayerListener extends PlayerListener
 {
 
 	public static Azimuth plugin;
-	private HashMap<Player, CompassContainer> players;
+	private HashMap<Player, CompassContainer> playersAndPrefs;
 
 	public CompassPlayerListener( Azimuth instance ) 
 	{
 		plugin = instance;
-		players = new HashMap<Player, CompassContainer>();
+		playersAndPrefs = new HashMap<Player, CompassContainer>();
 	}
-
+	
+	public boolean removeModeFromPlayer(Player player, String mode)
+	{
+		
+		
+		
+		
+		return false;
+	}
+	
+	public boolean addModeToPlayer(Player player, String mode)
+	{
+		
+		
+		
+		return false;
+	}
+	
+	private void createPlayer(Player player)
+	{
+		//create new player and add to container
+		CompassContainer container = playersAndPrefs.get( player );
+		if ( container == null ) 
+		{
+			// create new container with values, insert into dictionary
+			container = new CompassContainer( player.getWorld().getSpawnLocation() );
+			container.setSpawnLocation( player.getCompassTarget() );
+			//container.setMode( CompassModes.LAST_DEATH );
+			container.setSetPersonalSpawn( true );
+			playersAndPrefs.put( player, container );
+		}
+	}
+	
+	
+		
 	public void onPlayerInteract( PlayerInteractEvent event ) 
 	{
 		// declare and initialize player object
@@ -47,29 +81,22 @@ public class CompassPlayerListener extends PlayerListener
 		// if the item used is compass(entity id 345)
 		if ( event.getItem().getTypeId() == 345 ) 
 		{
-			CompassContainer container = players.get( player );
-			if ( container == null ) 
-			{
-				// create new container with values, insert into dictionary
-				container = new CompassContainer( player.getWorld().getSpawnLocation() );
-				container.setSpawnLocation( player.getCompassTarget() );
-				container.setMode( CompassModes.LAST_DEATH );
-				container.setSetPersonalSpawn( true );
-				players.put( player, container );
-			}
+			
+			createPlayer(player);
+			CompassContainer container = playersAndPrefs.get( player );
 			
 			//logic for circling what compass is pointing to
-			CompassModes mode = container.getMode();
+			CompassModes mode = container.nextMode();
 			switch ( mode ) 
 			{
 			case PERSONAL_SPAWN:
-				this.setLastDeathMode( player );
+				this.setPersonalSpawnMode( player );
 				break;
 			case LAST_DEATH:
-				this.setWorldSpawnPointMode( player );
+				this.setLastDeathMode( player );
 				break;
 			case WORLD_SPAWN_POINT:
-				this.setPersonalSpawnMode( player );
+				this.setWorldSpawnPointMode( player );
 				break;
 			}
 		}
@@ -79,7 +106,7 @@ public class CompassPlayerListener extends PlayerListener
 	public void setDeathLocation( Location death, Player newPlayer ) 
 	{
 		//try to get value to player key in hashmap
-		CompassContainer container = players.get( newPlayer );
+		CompassContainer container = playersAndPrefs.get( newPlayer );
 		if (container == null) // I haven't seen them yet
 		{
 			//create new container instance, populate with known values, insert into dictionary
@@ -88,7 +115,7 @@ public class CompassPlayerListener extends PlayerListener
 			container.setSpawnLocation( newPlayer.getCompassTarget() );
 			container.setMode( CompassModes.LAST_DEATH );
 			
-			players.put( newPlayer, container );
+			playersAndPrefs.put( newPlayer, container );
 			setWorldSpawnPointMode(newPlayer);
 		} 
 		else // I have seen them, just set the location
@@ -102,7 +129,7 @@ public class CompassPlayerListener extends PlayerListener
 		// declare and initialize player object
 		Player newPlayer = event.getPlayer();
 		//try to get value to player key in hashmap
-		CompassContainer container = players.get( newPlayer );
+		CompassContainer container = playersAndPrefs.get( newPlayer );
 		if ( container == null ) // I haven't seen them yet
 		{
 			//create new container instance, populate with known values, insert into dictionary
@@ -111,7 +138,7 @@ public class CompassPlayerListener extends PlayerListener
 			container.setMode( CompassModes.LAST_DEATH );
 			container.setSetPersonalSpawn( false );
 			
-			players.put( newPlayer, container );
+			playersAndPrefs.put( newPlayer, container );
 			setWorldSpawnPointMode( newPlayer );
 		}
 		else //I have seen them, just set the new location
@@ -123,7 +150,7 @@ public class CompassPlayerListener extends PlayerListener
 	private void setLastDeathMode( Player player ) 
 	{
 		//try to get value to player key in hashmap
-		CompassContainer container = players.get( player );
+		CompassContainer container = playersAndPrefs.get( player );
 		
 		//record moving to a new mode, then notify player
 		container.setMode( CompassContainer.CompassModes.LAST_DEATH );
@@ -145,7 +172,7 @@ public class CompassPlayerListener extends PlayerListener
 	private void setWorldSpawnPointMode( Player player ) 
 	{
 		//try to get value to player key in hashmap
-		CompassContainer container = players.get( player );
+		CompassContainer container = playersAndPrefs.get( player );
 		
 		//record moving to a new mode, then notify player
 		container.setMode( CompassContainer.CompassModes.WORLD_SPAWN_POINT );
@@ -157,7 +184,7 @@ public class CompassPlayerListener extends PlayerListener
 	private void setPersonalSpawnMode( Player player ) 
 	{
 		//try to get value to player key in hashmap
-		CompassContainer container = players.get( player );
+		CompassContainer container = playersAndPrefs.get( player );
 		
 		//record moving to a new mode, then notify player
 		container.setMode( CompassContainer.CompassModes.PERSONAL_SPAWN );
