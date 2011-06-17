@@ -42,11 +42,16 @@ public class Azimuth extends JavaPlugin
 		//behavior for compassAdd command
 		if(commandLabel.equalsIgnoreCase("compassAdd"))
 		{ 
-			//Don't check number of arguments, don't need to
+			//checks if there are no arguments
+			if( args.length < 1)
+			{
+				return false;
+			}
 			
 			//Console cannot add to compass rotation
 			if( ! (sender instanceof Player) )
 			{
+				sender.sendMessage("Command must be instantiated by a player.");
 				return false;
 			}
 			
@@ -70,11 +75,16 @@ public class Azimuth extends JavaPlugin
 		}
 		if(commandLabel.equalsIgnoreCase("compassRemove"))
 		{ 
-			//Don't check number of arguments, don't need to
+			//checks if there are no arguments
+			if( args.length < 1)
+			{
+				return false;
+			}
 			
 			//Console cannot add to compass rotation
 			if( ! (sender instanceof Player) )
 			{
+				sender.sendMessage("Command must be instantiated by a player.");
 				return false;
 			}
 			
@@ -102,11 +112,12 @@ public class Azimuth extends JavaPlugin
 			//Don't check number of arguments, don't need to
 			
 			//send message to commandSender
-			sender.sendMessage("/compassAdd [] will add new points to your rotation");
-			sender.sendMessage("/compassRemove [] will remove points to your compass rotation");
+			sender.sendMessage("/compassAdd [name] will add new points to your rotation");
+			sender.sendMessage("/compassRemove [name] will remove points from your compass rotation");
 			
 			return true;
 		}
+		
 		
 		return false; //just in case, to cover my ass
 	}

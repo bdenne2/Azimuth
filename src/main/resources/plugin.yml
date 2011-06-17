@@ -1,13 +1,14 @@
 name: Azimuth
 main: rockbeatspaper.Azimuth.Azimuth
-version: 0.1-SNAPSHOT
+version: 0.2-SNAPSHOT
 author: Bryanna Denney
 
 commands:
   compassAdd:         
     description: Adds new compass points to rotation.
     alias: azimuthAdd
-    usage: /<command> personal spawn OR +
+    usage: |
+           /<command> personal spawn OR
            /<command> personal_spawn OR
            /<command> personalSpawn
     
@@ -18,6 +19,7 @@ commands:
   compassRemove:
     description: Removes compass points from rotation.
     alias: azimuthRemove
-    usage: /<command> world spawn OR +
+    usage: |
+           /<command> world spawn OR
            /<command> world_spawn OR
            /<command> worldSpawn 
