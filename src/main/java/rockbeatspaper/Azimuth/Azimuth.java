@@ -27,6 +27,8 @@ public class Azimuth extends JavaPlugin
 		pm.registerEvent( Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this );
 		pm.registerEvent( Event.Type.ENTITY_DEATH, entityListener, Event.Priority.Normal, this );
 		
+		//TODO grab everyone on the server and run through 
+		
 	}
     
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args)
@@ -53,9 +55,9 @@ public class Azimuth extends JavaPlugin
 			//TODO make argument checking smarter
 			newArgs = newArgs.replaceAll("[\\s\\W]", ""); //replace all whitespace or non-alphanumeric chars with empty
 			
-			if( !playerListener.addModeToPlayer( (Player) sender, newArgs) )
+			if( playerListener.addModeToPlayer( (Player) sender, newArgs) )
 			{
-				sender.sendMessage("Did not go through. Something messed up for add.");
+				sender.sendMessage(ChatColor.GREEN + "Compass mode added to rotation.");
 			}
 			
 			return true; //finished command code
@@ -81,9 +83,9 @@ public class Azimuth extends JavaPlugin
 			//TODO make argument checking smarter
 			newArgs = newArgs.replaceAll("[\\s\\W]", ""); //replace all whitespace or non-alphanumeric chars with empty
 			
-			if( !playerListener.removeModeFromPlayer( (Player) sender, newArgs) )
+			if( playerListener.removeModeFromPlayer( (Player) sender, newArgs) )
 			{
-				sender.sendMessage("Did not go through. Something messed up for remove.");
+				sender.sendMessage(ChatColor.GREEN + "Compass mode removed from rotation.");
 			}
 			
 			return true; //finished command code
@@ -94,9 +96,8 @@ public class Azimuth extends JavaPlugin
 			//Don't check number of arguments, don't need to
 			
 			//send message to commandSender
-			String message = "/compassAdd will add new points to your rotation\n" +
-					"/compassRemove will remove points to your compass rotation\n";
-			sender.sendMessage(message);
+			sender.sendMessage("/compassAdd [] will add new points to your rotation");
+			sender.sendMessage("/compassRemove [] will remove points to your compass rotation");
 			
 			return true;
 		}
@@ -107,7 +108,7 @@ public class Azimuth extends JavaPlugin
     public void onDisable() 
     {
 		// TODO Auto-generated method stub
-
+    	log.info("Your plugin Azimuth(Compass) has been disabled.");
 	}
     
 }

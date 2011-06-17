@@ -41,6 +41,7 @@ public class CompassPlayerListener extends PlayerListener
 		}
 		else //this mode does not exist 
 		{
+			player.sendMessage(ChatColor.RED + "This compass mode does not exist.");
 			return false;
 		}
 	}
@@ -60,8 +61,11 @@ public class CompassPlayerListener extends PlayerListener
 		{
 			return container.addMode( CompassModes.LAST_DEATH );
 		}
-		
-		return false;
+		else
+		{
+			player.sendMessage(ChatColor.RED + "This compass mode does not exist.");
+			return false;
+		}
 	}
 	
 	private void createPlayer(Player player)
@@ -71,7 +75,7 @@ public class CompassPlayerListener extends PlayerListener
 		if ( container == null ) 
 		{
 			// create new container with values, insert into dictionary
-			container = new CompassContainer( player.getWorld().getSpawnLocation() );
+			container = new CompassContainer( player.getWorld().getSpawnLocation(), player );
 			container.setSpawnLocation( player.getCompassTarget() );
 			//container.setMode( CompassModes.LAST_DEATH );
 			container.setSetPersonalSpawn( true );
@@ -107,6 +111,13 @@ public class CompassPlayerListener extends PlayerListener
 			createPlayer(player);
 			CompassContainer container = playersAndPrefs.get( player );
 			
+			//check if player can't rotate(i.e. has removed all from rotation)
+			if( container.emptyRotation() )
+			{
+				player.sendMessage(ChatColor.RED + "Cannot change modes because all modes are removed.");
+				return;
+			}
+			
 			//logic for circling what compass is pointing to
 			CompassModes mode = container.nextMode();
 			switch ( mode ) 
@@ -132,7 +143,7 @@ public class CompassPlayerListener extends PlayerListener
 		if (container == null) // I haven't seen them yet
 		{
 			//create new container instance, populate with known values, insert into dictionary
-			container = new CompassContainer( newPlayer.getWorld().getSpawnLocation() );
+			container = new CompassContainer( newPlayer.getWorld().getSpawnLocation(), newPlayer );
 			container.setDeathLocation( death );
 			container.setSpawnLocation( newPlayer.getCompassTarget() );
 			container.setMode( CompassModes.LAST_DEATH );
@@ -155,7 +166,7 @@ public class CompassPlayerListener extends PlayerListener
 		if ( container == null ) // I haven't seen them yet
 		{
 			//create new container instance, populate with known values, insert into dictionary
-			container = new CompassContainer( newPlayer.getWorld().getSpawnLocation() );
+			container = new CompassContainer( newPlayer.getWorld().getSpawnLocation(), newPlayer );
 			container.setSpawnLocation( event.getRespawnLocation() );
 			container.setMode( CompassModes.LAST_DEATH );
 			container.setSetPersonalSpawn( false );

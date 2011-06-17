@@ -2,6 +2,8 @@ package rockbeatspaper.Azimuth;
 
 import java.util.ArrayList;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.ChatColor;
 
 public class CompassContainer 
 {
@@ -12,8 +14,9 @@ public class CompassContainer
 	private ArrayList<CompassModes> playerModes;
 	private boolean setPersonalSpawn;
 	private Location worldSpawnLocation;
+	private Player myPlayer;
 	
-	public CompassContainer(Location newWorldSpawnLocation)
+	public CompassContainer(Location newWorldSpawnLocation, Player newPlayer)
 	{
 		worldSpawnLocation = newWorldSpawnLocation;
 		
@@ -22,6 +25,7 @@ public class CompassContainer
 		spawnLocation = null;
 		mode = 0;
 		setPersonalSpawn = true;
+		myPlayer = newPlayer;
 		
 		//create arraylist with three default values
 		playerModes = new ArrayList<CompassModes>();
@@ -37,7 +41,17 @@ public class CompassContainer
 			mode = 0;
 			return playerModes.remove(modeToRemove);
 		}
-		return false;
+		else
+		{
+			myPlayer.sendMessage(ChatColor.RED + "This compass mode is already removed from your rotation.");
+			return false;
+		}
+		
+	}
+	
+	public boolean emptyRotation()
+	{
+		return playerModes.isEmpty();
 	}
 	
 	public boolean addMode(CompassModes modeToAdd)
@@ -47,7 +61,11 @@ public class CompassContainer
 			mode = 0;
 			return playerModes.add(modeToAdd);
 		}
-		return false;
+		else
+		{
+			myPlayer.sendMessage(ChatColor.RED + "This compass mode is already in your rotation.");
+			return false;
+		}
 	}
 	
 	public CompassModes nextMode()
