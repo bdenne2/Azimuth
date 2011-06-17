@@ -31,7 +31,7 @@ public class CompassPlayerListener extends PlayerListener
 		{
 			return container.removeMode( CompassModes.WORLD_SPAWN_POINT );
 		}
-		else if( mode.equals("personalSpawn") )
+		else if( mode.equals("personalspawn") )
 		{
 			return container.removeMode( CompassModes.PERSONAL_SPAWN );
 		}
@@ -47,8 +47,19 @@ public class CompassPlayerListener extends PlayerListener
 	
 	public boolean addModeToPlayer(Player player, String mode)
 	{
-		
-		
+		CompassContainer container = playersAndPrefs.get( player );
+		if( mode.equals("worldspawn") )
+		{
+			return container.addMode( CompassModes.WORLD_SPAWN_POINT );
+		}
+		else if( mode.equals("personalspawn") )
+		{
+			return container.addMode( CompassModes.PERSONAL_SPAWN );
+		}
+		else if( mode.equals("lastdeath") )
+		{
+			return container.addMode( CompassModes.LAST_DEATH );
+		}
 		
 		return false;
 	}

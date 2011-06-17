@@ -23,18 +23,29 @@ public class CompassContainer
 		mode = 0;
 		setPersonalSpawn = true;
 		
-		//create linked list with three default values
+		//create arraylist with three default values
 		playerModes = new ArrayList<CompassModes>();
 		playerModes.add(CompassModes.WORLD_SPAWN_POINT);
 		playerModes.add(CompassModes.PERSONAL_SPAWN);
 		playerModes.add(CompassModes.LAST_DEATH);
 	}
 	
-	public boolean removeMode(CompassModes mode)
+	public boolean removeMode(CompassModes modeToRemove)
 	{
-		if( playerModes.contains(mode) )
+		if( playerModes.contains(modeToRemove) )
 		{
-			return playerModes.remove(mode);
+			mode = 0;
+			return playerModes.remove(modeToRemove);
+		}
+		return false;
+	}
+	
+	public boolean addMode(CompassModes modeToAdd)
+	{
+		if( !(playerModes.contains(modeToAdd))  )
+		{
+			mode = 0;
+			return playerModes.add(modeToAdd);
 		}
 		return false;
 	}

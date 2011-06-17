@@ -37,7 +37,7 @@ public class Azimuth extends JavaPlugin
 			//Don't check number of arguments, don't need to
 			
 			//Console cannot add to compass rotation
-			if( !(sender instanceof Player) )
+			if( ! (sender instanceof Player) )
 			{
 				return false;
 			}
@@ -55,7 +55,35 @@ public class Azimuth extends JavaPlugin
 			
 			if( !playerListener.addModeToPlayer( (Player) sender, newArgs) )
 			{
-				sender.sendMessage("Did not go through. Something messed up.");
+				sender.sendMessage("Did not go through. Something messed up for add.");
+			}
+			
+			return true; //finished command code
+		}
+		if(commandLabel.equalsIgnoreCase("compassRemove"))
+		{ 
+			//Don't check number of arguments, don't need to
+			
+			//Console cannot add to compass rotation
+			if( ! (sender instanceof Player) )
+			{
+				return false;
+			}
+			
+			//concatenates the argument array into one string
+			String newArgs = "";
+			for( int i=0; i != args.length; ++i)
+			{
+				newArgs += args[i];
+			}
+			
+			newArgs = newArgs.toLowerCase();
+			//TODO make argument checking smarter
+			newArgs = newArgs.replaceAll("[\\s\\W]", ""); //replace all whitespace or non-alphanumeric chars with empty
+			
+			if( !playerListener.removeModeFromPlayer( (Player) sender, newArgs) )
+			{
+				sender.sendMessage("Did not go through. Something messed up for remove.");
 			}
 			
 			return true; //finished command code
