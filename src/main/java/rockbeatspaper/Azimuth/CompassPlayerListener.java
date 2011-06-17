@@ -9,6 +9,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import rockbeatspaper.Azimuth.CompassContainer.CompassModes;
 
@@ -68,7 +69,12 @@ public class CompassPlayerListener extends PlayerListener
 		}
 	}
 	
-	private void createPlayer(Player player)
+	public void onPlayerJoin(PlayerJoinEvent event)
+	{
+		createPlayer( event.getPlayer() );
+	}
+	
+	public void createPlayer(Player player)
 	{
 		//create new player and add to container
 		CompassContainer container = playersAndPrefs.get( player );

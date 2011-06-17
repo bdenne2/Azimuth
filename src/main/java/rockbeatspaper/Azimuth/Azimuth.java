@@ -25,9 +25,15 @@ public class Azimuth extends JavaPlugin
 		PluginManager pm = this.getServer().getPluginManager();
 		pm.registerEvent( Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this );
 		pm.registerEvent( Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this );
+		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent( Event.Type.ENTITY_DEATH, entityListener, Event.Priority.Normal, this );
 		
-		//TODO grab everyone on the server and run through 
+		//TODO grab everyone on the server and run through
+		Player[] onlinePlayers = this.getServer().getOnlinePlayers(); 
+		for( Player player: onlinePlayers)
+		{
+			playerListener.createPlayer(player);
+		}
 		
 	}
     
