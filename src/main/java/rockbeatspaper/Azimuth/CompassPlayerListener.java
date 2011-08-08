@@ -6,6 +6,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -16,15 +18,26 @@ import rockbeatspaper.Azimuth.CompassContainer.CompassModes;
 public class CompassPlayerListener extends PlayerListener 
 {
 
-	public static Azimuth plugin;
+	public static Azimuth plugin; //
 	private HashMap<Player, CompassContainer> playersAndPrefs;
 
+	
+	/**
+	 * Public constructor that initializes the reference 
+	 * @param instance - needed reference back to plugin.
+	 */
 	public CompassPlayerListener( Azimuth instance ) 
 	{
 		plugin = instance;
 		playersAndPrefs = new HashMap<Player, CompassContainer>();
 	}
 	
+	/**
+	 * Removes mode from rotation of player.
+	 * @param player
+	 * @param mode - string for which mode to remove.
+	 * @return true when successful. False if not.
+	 */
 	public boolean removeModeFromPlayer(Player player, String mode)
 	{
 		CompassContainer container = playersAndPrefs.get( player );
@@ -47,6 +60,12 @@ public class CompassPlayerListener extends PlayerListener
 		}
 	}
 	
+	/**
+	 * Adds mode to rotation of player.
+	 * @param player
+	 * @param mode - string for which mode to add.
+	 * @return true when successful. False if not.
+	 */
 	public boolean addModeToPlayer(Player player, String mode)
 	{
 		CompassContainer container = playersAndPrefs.get( player );
@@ -69,12 +88,20 @@ public class CompassPlayerListener extends PlayerListener
 		}
 	}
 	
+	/**
+	 * Catches when player joins the server and creates a player.
+	 */
 	public void onPlayerJoin(PlayerJoinEvent event)
 	{
 		createPlayer( event.getPlayer() );
 	}
 	
-	public void createPlayer(Player player)
+	/**
+	 * Creates new container, sets its defaults and adds to hashmap of all players
+	 * @param player
+	 * @return false if player already exists.
+	 */
+	public boolean createPlayer(Player player)
 	{
 		//create new player and add to container
 		CompassContainer container = playersAndPrefs.get( player );
@@ -86,11 +113,20 @@ public class CompassPlayerListener extends PlayerListener
 			//container.setMode( CompassModes.LAST_DEATH );
 			container.setSetPersonalSpawn( true );
 			playersAndPrefs.put( player, container );
+			return true;
+		}
+		else
+		{
+			return false; //already is a player
 		}
 	}
 	
 	
-		
+	/**
+	 * Catches when a player interacts with the world.
+	 * If all of the conditions are right, mode will get rotated on the compass and the player will be informed.
+	 * 	The conditions are: a right click was executed, the player is holding a compass.
+	 */
 	public void onPlayerInteract( PlayerInteractEvent event ) 
 	{
 		// declare and initialize player object
@@ -142,50 +178,72 @@ public class CompassPlayerListener extends PlayerListener
 
 	}
 
+	/**
+	 * Stores where the death location is for specific player.
+	 * @param death - (x,y,z) location of death of the player
+	 * @param newPlayer - player death location is for.
+	 */
 	public void setDeathLocation( Location death, Player newPlayer ) 
 	{
-		//try to get value to player key in hashmap
-		CompassContainer container = playersAndPrefs.get( newPlayer );
-		if (container == null) // I haven't seen them yet
-		{
-			//create new container instance, populate with known values, insert into dictionary
-			container = new CompassContainer( newPlayer.getWorld().getSpawnLocation(), newPlayer );
-			container.setDeathLocation( death );
-			container.setSpawnLocation( newPlayer.getCompassTarget() );
-			container.setMode( CompassModes.LAST_DEATH );
-			
-			playersAndPrefs.put( newPlayer, container );
-			setWorldSpawnPointMode(newPlayer);
-		} 
-		else // I have seen them, just set the location
-		{
-			container.setDeathLocation( death );
-		}
+		this.createPlayer(newPlayer);
+		CompassContainer container = playersAndPrefs.get(newPlayer);
+		container.setDeathLocation( death );
 	}
 
+	/**
+	 * Watches for player respawn event, notes location of spawn and call setSpawnLocation(...)
+	 */
 	public void onPlayerRespawn( PlayerRespawnEvent event ) 
 	{
 		// declare and initialize player object
 		Player newPlayer = event.getPlayer();
-		//try to get value to player key in hashmap
+		this.createPlayer(newPlayer);
 		CompassContainer container = playersAndPrefs.get( newPlayer );
-		if ( container == null ) // I haven't seen them yet
+		container.setSpawnLocation( event.getRespawnLocation() );
+	}
+	
+	public void onPlayerBedEnter( PlayerBedEnterEvent event)
+	{
+		/*
+		if(! event.isCancelled() ) //if the player does not cancel the event
 		{
-			//create new container instance, populate with known values, insert into dictionary
-			container = new CompassContainer( newPlayer.getWorld().getSpawnLocation(), newPlayer );
-			container.setSpawnLocation( event.getRespawnLocation() );
-			container.setMode( CompassModes.LAST_DEATH );
-			container.setSetPersonalSpawn( false );
-			
-			playersAndPrefs.put( newPlayer, container );
-			setWorldSpawnPointMode( newPlayer );
+			event.getPlayer().sendMessage("Did not cancel bed.");
 		}
-		else //I have seen them, just set the new location
+		else
 		{
-			container.setSpawnLocation( event.getRespawnLocation() );
+			event.getPlayer().sendMessage("Cancelled bed.");
 		}
+		
+		if( event.getPlayer().isSleeping() ) //if the player does not cancel the event
+		{
+			event.getPlayer().sendMessage("Sleeping");
+		}
+		else
+		{
+			event.getPlayer().sendMessage("Is not sleeping.");
+		}
+		*/
+		
+	}
+	
+	public void onPlayerBedLeave( PlayerBedLeaveEvent event)
+	{
+		/*
+		if( event.getPlayer().isSleeping() ) //if the player does not cancel the event
+		{
+			event.getPlayer().sendMessage("Sleeping");
+		}
+		else
+		{
+			event.getPlayer().sendMessage("Is not sleeping.");
+		}
+		*/
 	}
 
+	/**
+	 * Makes compass point to last death location and notifies player of being in last death compass mode.
+	 * @param player - player whose compass is changing modes.
+	 */
 	private void setLastDeathMode( Player player ) 
 	{
 		//try to get value to player key in hashmap
@@ -208,6 +266,10 @@ public class CompassPlayerListener extends PlayerListener
 
 	}
 
+	/**
+	 * Makes compass point to world spawn location and notifies player of being in world spawn compass mode.
+	 * @param player - player whose compass is changing modes.
+	 */
 	private void setWorldSpawnPointMode( Player player ) 
 	{
 		//try to get value to player key in hashmap
@@ -220,6 +282,10 @@ public class CompassPlayerListener extends PlayerListener
 		player.setCompassTarget( container.getWorldSpawnLocation() );
 	}
 
+	/**
+	 * Makes compass point to personal spawn location and notifies player of being in personal spawn compass mode.
+	 * @param player - player whose compass is changing modes.
+	 */
 	private void setPersonalSpawnMode( Player player ) 
 	{
 		//try to get value to player key in hashmap

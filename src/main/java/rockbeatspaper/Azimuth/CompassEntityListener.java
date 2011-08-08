@@ -19,6 +19,9 @@ public class CompassEntityListener extends EntityListener
         playerListener = playerInstance;
 	}
 	
+	/**
+	 * Watches for death of player and notifies playerListener to set the death location.
+	 */
 	public void onEntityDeath(EntityDeathEvent event) 
 	{
 		if( event.getEntity() instanceof Player )

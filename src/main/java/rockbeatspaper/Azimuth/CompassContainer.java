@@ -16,6 +16,11 @@ public class CompassContainer
 	private Location worldSpawnLocation;
 	private Player myPlayer;
 	
+	/**
+	 * Constructor.
+	 * @param newWorldSpawnLocation
+	 * @param newPlayer
+	 */
 	public CompassContainer(Location newWorldSpawnLocation, Player newPlayer)
 	{
 		worldSpawnLocation = newWorldSpawnLocation;
@@ -34,6 +39,11 @@ public class CompassContainer
 		playerModes.add(CompassModes.LAST_DEATH);
 	}
 	
+	/**
+	 * Removes mode from player's rotation and adjusts which mode compass is in
+	 * @param modeToRemove
+	 * @return true if remove was successful.
+	 */
 	public boolean removeMode(CompassModes modeToRemove)
 	{
 		if( playerModes.contains(modeToRemove) )
@@ -49,11 +59,20 @@ public class CompassContainer
 		
 	}
 	
+	/**
+	 * Returns if the rotation is empty, ie player has removed all modes from rotation.
+	 * @return true if all modes have been removed.
+	 */
 	public boolean emptyRotation()
 	{
 		return playerModes.isEmpty();
 	}
 	
+	/**
+	 * Adds mode ot player's rotation and adjusts which mode compass is in
+	 * @param modeToAdd
+	 * @return
+	 */
 	public boolean addMode(CompassModes modeToAdd)
 	{
 		if( !(playerModes.contains(modeToAdd))  )
@@ -68,6 +87,10 @@ public class CompassContainer
 		}
 	}
 	
+	/**
+	 * Returns mode next in line.
+	 * @return
+	 */
 	public CompassModes nextMode()
 	{
 		if( (mode+1) == playerModes.size() )
@@ -118,6 +141,11 @@ public class CompassContainer
 		spawnLocation = newSpawnLocation;
 	}
 	
+	/**
+	 * Sets current mode the compass is in.
+	 * @param newMode - to change the current mode to
+	 * @return false if mode requested is not currently in rotation
+	 */
 	public boolean setMode(CompassModes newMode)
 	{
 		if( playerModes.contains(newMode) )

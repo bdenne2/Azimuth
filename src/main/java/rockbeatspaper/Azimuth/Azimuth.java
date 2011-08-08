@@ -16,7 +16,11 @@ public class Azimuth extends JavaPlugin
     private final CompassPlayerListener playerListener = new CompassPlayerListener( this );
     private final CompassEntityListener entityListener = new CompassEntityListener( this, playerListener );
     
-    
+    /**
+     * Prepares my plugin with initial actions on startup.
+     * Registers events with plugin manager.
+     * Runs through online player list and creates a player object for them.
+     */
 	public void onEnable() 
 	{
 		log = Logger.getLogger("Minecraft");
@@ -24,9 +28,12 @@ public class Azimuth extends JavaPlugin
 		
 		PluginManager pm = this.getServer().getPluginManager();
 		pm.registerEvent( Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this );
+		pm.registerEvent( Event.Type.PLAYER_BED_ENTER, playerListener, Event.Priority.Normal, this);
+		pm.registerEvent( Event.Type.PLAYER_BED_LEAVE, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent( Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this );
-		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Normal, this);
+		pm.registerEvent( Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent( Event.Type.ENTITY_DEATH, entityListener, Event.Priority.Normal, this );
+		
 		
 		//TODO grab everyone on the server and run through
 		Player[] onlinePlayers = this.getServer().getOnlinePlayers(); 
@@ -37,6 +44,12 @@ public class Azimuth extends JavaPlugin
 		
 	}
     
+	/**
+	 * onCommand(...) will be called when an entity makes a command. This method outlines the actions to be done when the command is recognized.
+	 * All commands are first registered in plugin.yml file.
+	 * @param commandLabel - command sent. First word of command sent.
+	 * @param args - arguments to command sent. Rest of the command after the first word.
+	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args)
 	{	  
 		//behavior for compassAdd command
